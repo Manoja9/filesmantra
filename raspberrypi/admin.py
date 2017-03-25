@@ -2,6 +2,6 @@ from django.contrib import admin
 
 from raspberrypi.models import *
 
-admin.site.register(Accounts)
-admin.site.register(UserTags)
+admin.site.register(Account)
+admin.site.register(UserTag)
 admin.site.register(TransactionType)

@@ -11,7 +11,7 @@ class ModelBase(models.Model):
         abstract = True
 
 
-class Accounts(ModelBase):
+class Account(ModelBase):
     owner = models.ForeignKey(User)
     name = models.CharField(max_length=255)
     amount = models.PositiveIntegerField()
@@ -20,7 +20,7 @@ class Accounts(ModelBase):
         return "{}-{}".format(self.owner, self.name)
 
 
-class UserTags(ModelBase):
+class UserTag(ModelBase):
     creator = models.ForeignKey(User, null=True, blank=True)
     name = models.CharField(max_length=255)
 
@@ -36,9 +36,9 @@ class TransactionType(ModelBase):
     type = models.CharField(max_length=127, choices=TransactionModes)
     amount = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
-    primary_account = models.ForeignKey(Accounts, related_name='primary_account')
-    secondary_account = models.ForeignKey(Accounts, related_name='secondary_account', null=True, blank=True)
-    tag = models.ForeignKey(UserTags, null=True, blank=True)
+    primary_account = models.ForeignKey(Account, related_name='primary_account')
+    secondary_account = models.ForeignKey(Account, related_name='secondary_account', null=True, blank=True)
+    tag = models.ForeignKey(UserTag, null=True, blank=True)
 
     def __unicode__(self):
         return "{}-{}".format(self.primary_account, self.type)

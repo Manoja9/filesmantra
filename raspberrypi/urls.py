@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 import views
+import api
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -24,5 +25,8 @@ urlpatterns = [
     url(r'^$', views.home),
     url(r'login$', views.login, name='login'),
     url(r'logout$', views.logout, name='logout'),
-    url(r'', include('social.apps.django_app.urls', namespace='social'))
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'accounts/(?P<pk>[^/]+)/', api.AccountAPI.as_view()),
+    url(r'transaction/(?P<pk>[^/]+)/', api.TransactionAPI.as_view()),
+    url(r'user-tag/(?P<pk>[^/]+)/', api.UserTagAPI.as_view())
 ]
