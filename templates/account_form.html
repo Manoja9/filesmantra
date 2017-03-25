@@ -1,0 +1,30 @@
+<div>
+    <div class="row">
+        <div class="col-md-10">
+            <div id="add-account-form" hidden>
+                <form>
+                    <input type="text" id="add-account-form-name" placeholder="Name">
+                    <input type="number" id="add-account-form-amount" min="1" placeholder="Amount">
+                    <button
+                        type="button"
+                        onclick="add_account_toggle(); create_account();"
+                        class="btn btn-primary add-account-btn">
+                        Done
+                    </button>
+                </form>
+                <button type="button" onclick="add_account_toggle()" class="btn btn-primary">
+                    Cancel
+                </button>
+            </div>
+            <button type="button" onclick="add_account_toggle()" class="btn btn-primary" id="add-account-btn">Add Account</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table table-striped">
+                <tbody id="account-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

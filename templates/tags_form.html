@@ -1,0 +1,27 @@
+<div>
+    <div class="row">
+        <div class="col-md-10">
+            <div id="add-tag-form" hidden>
+                <input type="text" placeholder="Name" id="add-tag-name">
+                <button
+                    type="button"
+                    onclick="add_tag_toggle(); create_tag();"
+                    class="btn btn-primary">
+                    Done
+                </button>
+                <button type="button" onclick="add_tag_toggle()" class="btn btn-primary">
+                    Cancel
+                </button>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="add_tag_toggle()" id="add-tag-btn">Add tags</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table table-striped">
+                <tbody id="tags-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

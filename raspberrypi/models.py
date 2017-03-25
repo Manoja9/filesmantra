@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
-
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 
 class ModelBase(models.Model):
@@ -42,3 +43,52 @@ class TransactionType(ModelBase):
 
     def __unicode__(self):
         return "{}-{}".format(self.primary_account, self.type)
+
+    def save(self, *args, **kwargs):
+        if self.type == self.TransactionModes[0][0]:
+            account = Account.objects.get(id=self.primary_account.id)
+            account.amount += self.amount
+            account.save()
+        elif self.type == self.TransactionModes[1][0]:
+            account = Account.objects.get(id=self.primary_account.id)
+            account.amount -= self.amount
+            account.save()
+        elif self.type == self.TransactionModes[2][0]:
+            if not self.secondary_account:
+                raise ValueError("secondary account should be present in transfer")
+            account = Account.objects.get(id=self.primary_account.id)
+            account.amount -= self.amount
+            account.save()
+            account = Account.objects.get(id=self.secondary_account.id)
+            account.amount += self.amount
+            account.save()
+        else:
+            Account.objects.filter(id=self.primary_account.id).update(amount=self.amount)
+        super(TransactionType, self).save(*args, **kwargs)
+
+
+@receiver(pre_delete, sender=TransactionType)
+def _transaction_delete(sender, instance, **kwargs):
+    if instance.type == instance.TransactionModes[0][0]:
+        account = Account.objects.get(id=instance.primary_account.id)
+        account.amount -= instance.amount
+        account.save()
+    elif instance.type == instance.TransactionModes[1][0]:
+        account = Account.objects.get(id=instance.primary_account.id)
+        account.amount += instance.amount
+        account.save()
+    elif instance.type == instance.TransactionModes[2][0]:
+        account = Account.objects.get(id=instance.primary_account.id)
+        account.amount += instance.amount
+        account.save()
+        account = Account.objects.filter(id=instance.secondary_account.id).first()
+        if account:
+            account.amount -= instance.amount
+            account.save()
+    else:
+        pass
+
+
+@receiver(pre_delete, sender=Account)
+def _account_delete(sender, instance, **kwargs):
+    TransactionType.objects.filter(primary_account=instance).delete()

@@ -39,7 +39,7 @@ class AccountAPI(APIView):
         Returns:
 
         """
-        post_data = request.data
+        post_data = request.data.copy()
         post_data.update({"owner": request.user.id})
         account_serializer = AccountSerializer(data=post_data)
         if account_serializer.is_valid():
@@ -70,7 +70,10 @@ class TransactionAPI(APIView):
         return TransactionType.objects.filter(id=pk, primary_account__owner=self.request.user)
 
     def get(self, request, pk):
-        transactions = TransactionType.objects.filter(primary_account=request.GET.get('account'))
+        if request.GET.get('account'):
+            transactions = TransactionType.objects.filter(primary_account=request.GET.get('account'))
+        else:
+            transactions = TransactionType.objects.filter(primary_account__owner=request.user)
         serialized_response = TransactionSerializer(transactions, many=True)
         return Response(serialized_response.data)
 
@@ -109,7 +112,7 @@ class UserTagAPI(APIView):
         return Response(serialized_response.data)
 
     def post(self, request, pk):
-        post_data = request.data
+        post_data = request.data.copy()
         post_data.update({"creator": request.user.id})
         user_tag_serializer = UserTagSerializer(data=post_data)
         if user_tag_serializer.is_valid():

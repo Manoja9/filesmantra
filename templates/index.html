@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-{% include 'header.html' %}
+    <div class="row">
+        {% include 'header.html' %}
+    </div>
+    <div class="row">
+        <div class="col-md-3 accounts-container">
+            {% include 'account_form.html' %}
+        </div>
+        <div class="col-md-6 dashboard-container">
+            {% include 'dashboard.html' %}
+        </div>
+        <div class="col-md-3 tags-container">
+            {% include 'tags_form.html' %}
+        </div>
+    </div>
+
+
 {% endblock %}
