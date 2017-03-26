@@ -9,7 +9,7 @@ def home(request):
 
 
 def login(request):
-    return redirect('/login/google-oauth2/?next=/')
+    return render(request, 'login.html')
 
 
 def logout(request):
