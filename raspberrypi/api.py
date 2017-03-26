@@ -64,7 +64,7 @@ class TransactionAPI(APIView):
         """
         return TransactionType.objects.filter(id=pk, primary_account__owner=self.request.user)
 
-    def get(self, request, pk):
+    def get(self, request, **kwargs):
         if request.GET.get('account'):
             transactions = TransactionType.objects.filter(primary_account=request.GET.get('account'))
         else:

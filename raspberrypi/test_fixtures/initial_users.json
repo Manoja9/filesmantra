@@ -1,0 +1,18 @@
+[{
+	"model": "auth.user",
+	"pk": 1,
+	"fields": {
+		"password": "foobar",
+		"last_login": "2017-03-26T13:54:36.418Z",
+		"is_superuser": true,
+		"username": "foo.bar",
+		"first_name": "FooFoo",
+		"last_name": "BarBar",
+		"email": "bar.foo@gmail.com",
+		"is_staff": true,
+		"is_active": true,
+		"date_joined": "2017-03-24T20:20:49Z",
+		"groups": [],
+		"user_permissions": []
+	}
+}]
