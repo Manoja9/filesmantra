@@ -15,3 +15,4 @@
   python manage.py test
  ```
  ### Note: use only localhost:8000 port since Google OAuth redirect url is only localhost:8000
+ >Incase of any doubts on the filters please hover on them
