@@ -15,7 +15,7 @@ class ModelBase(models.Model):
 class Account(ModelBase):
     owner = models.ForeignKey(User)
     name = models.CharField(max_length=255)
-    amount = models.PositiveIntegerField()
+    amount = models.IntegerField()
 
     def __unicode__(self):
         return "{}-{}".format(self.owner, self.name)
@@ -39,12 +39,17 @@ class TransactionType(ModelBase):
     description = models.TextField(null=True, blank=True)
     primary_account = models.ForeignKey(Account, related_name='primary_account')
     secondary_account = models.ForeignKey(Account, related_name='secondary_account', null=True, blank=True)
-    tag = models.ForeignKey(UserTag, null=True, blank=True)
+    tag = models.ForeignKey(UserTag, null=True, blank=True, on_delete=models.SET_NULL)
+    for_date = models.DateField()
 
     def __unicode__(self):
         return "{}-{}".format(self.primary_account, self.type)
 
     def save(self, *args, **kwargs):
+        """
+            Overriding save function in order to update related accounts
+
+        """
         if self.type == self.TransactionModes[0][0]:
             account = Account.objects.get(id=self.primary_account.id)
             account.amount += self.amount
@@ -69,6 +74,10 @@ class TransactionType(ModelBase):
 
 @receiver(pre_delete, sender=TransactionType)
 def _transaction_delete(sender, instance, **kwargs):
+    """
+        Gets triggered when a transaction is deleted and reverts back the transaction affects to the account
+
+    """
     if instance.type == instance.TransactionModes[0][0]:
         account = Account.objects.get(id=instance.primary_account.id)
         account.amount -= instance.amount
@@ -91,4 +100,8 @@ def _transaction_delete(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Account)
 def _account_delete(sender, instance, **kwargs):
+    """
+        Deletes all the transactions related to that account
+
+    """
     TransactionType.objects.filter(primary_account=instance).delete()

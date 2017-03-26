@@ -5,24 +5,24 @@
     </div>
     <div class="navbar-form navbar-left">
         <select name="transaction_type">
-          <option>Income</option>
-          <option>Expense</option>
-          <option>Balance Reset</option>
-          <option>Transfer</option>
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+            <option value="BalanceReset">Balance Reset</option>
+            <option value="Transfer">Transfer</option>
         </select>
         <input type="number" name="amount" min="1" placeholder="Amount">
-        <input list="tags" name="tags" placeholder="Tag">
-        <datalist id="tags">
-        </datalist>
-        <input list="accounts" name="account" placeholder="Account">
-        <datalist id="accounts">
-        </datalist>
-      <button onclick="" class="btn btn-default">
+        <select id="tags" placeholder="Tag"></select>
+        <select id="header-form-primary-accounts">
+        </select>
+        <select id="header-form-secondary-accounts">
+        </select>
+        <input type="text" id="datepicker" placeholder="for_date" onchange="update_transactions_list()">
+      <button onclick="create_transaction()" class="btn btn-default">
         <span class="glyphicon glyphicon-plus"></span>
       </button>
     </div>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      <li><a href="/logout">{{user.get_username}} <span class="glyphicon glyphicon-log-out"></span></a></li>
     </ul>
   </div>
 </nav>

@@ -7,35 +7,71 @@ function load_accounts(){
         accounts = data;
         var options = '';
         var table_rows = ''
+        var total_amount = 0;
         for(var i = 0; i < accounts.length; i++){
-        options += '<option value="'+accounts[i].name+'" />';
+        options += '<option value="'+accounts[i].id+'"> '+accounts[i].name+'</option>';
         table_rows += '<tr><td>'+accounts[i].name+' '+accounts[i].amount+'  <span class="glyphicon glyphicon-remove"';
         table_rows += ' onclick=delete_account('+accounts[i].id +')></span></td></tr>';
+        total_amount += accounts[i].amount;
         }
+        table_rows += '<tr><td> all accounts '+total_amount+'</td></tr>';
         console.log(options);
-        document.getElementById('accounts').innerHTML = options;
+        document.getElementById('header-form-primary-accounts').innerHTML = options;
+        document.getElementById('header-form-secondary-accounts').innerHTML = options;
         document.getElementById('account-table-body').innerHTML = table_rows;
     },
-    error: function(data){
-            alert('errors');
+    error: function(error){
+            alert(error.responseText);
     }
     });
 }
 
-function load_transactions(account_no){
-
+function load_transactions(account_no=null, transaction_type = null, for_date=null){
     var get_url = '/transaction/1/'
+    var get_data = {}
     if (account_no)
-        get_url += '?account='+account_no;
+        get_data = {account: account_no};
+    if (transaction_type)
+        get_data.type = transaction_type;
+    if (for_date)
+        get_data.for_date = for_date;
+    console.log(get_data);
     $.ajax({
     url: get_url,
+    data: get_data,
     type: "get",
     success: function(data){
-        console.log(data);
+        var rows = ''
+        var empty_cell = '<td> - </td>'
+        var transactions = data;
+        var monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        var month = monthNames[Number(document.getElementById('datepicker').value.split('-')[1])-1];
+        document.getElementById('datepicker').value.split('-')[1];
+        var title = '<h4>Transactions for '+month+'</h4>';
+        for (var i=0; i< transactions.length; i++){
+            rows += '<tr><td>'+ transactions[i].type+'</td>';
+            rows += '<td>'+transactions[i].amount+'</td>';
+            if (transactions[i].tag){
+            rows += '<td style="background-color:'+stringToColour(transactions[i].tag.name)+'">'+transactions[i].tag.name+'</td>';}
+            else{
+            rows += empty_cell;}
+            rows += '<td>'+transactions[i].primary_account.name+'</td>';
+            if (transactions[i].secondary_account){
+            rows += '<td>'+transactions[i].secondary_account.name+'</td>';}
+            else{
+            rows += empty_cell;}
+            rows += '<td><span class="glyphicon glyphicon-remove" onclick="delete_transaction('+transactions[i].id;
+            rows += ')"></span></td>'
 
+        }
+        document.getElementById('dashboard-table-body').innerHTML = rows;
+        document.getElementById('dashboard-table').innerHTML = title;
     },
-    error: function(data){
-            alert('errors');
+    error: function(error){
+            alert(error.responseText);
     }
     });
 }
@@ -47,28 +83,38 @@ function load_tags(){
     success: function(data){
         var tags = new Array();
         tags = data;
-        var options = '';
+        var options = '<option value="">Tags</option>';
         var table_rows = '';
         console.log(tags)
         for(var i = 0; i < tags.length; i++){
-        options += '<option value="'+tags[i].name+'" />';
-        table_rows += '<tr><td>'+tags[i].name+' <span class="glyphicon glyphicon-remove"';
+        options += '<option value="'+tags[i].id+'">'+tags[i].name+'</option>';
+        table_rows += '<tr><td style="background-color:'+stringToColour(tags[i].name) +'">';
+        table_rows+=tags[i].name+' <span class="glyphicon glyphicon-remove"';
         table_rows += ' onclick=delete_tag('+tags[i].id +')></span></td></tr>';
         }
         console.log(options);
         document.getElementById('tags').innerHTML = options;
         document.getElementById('tags-table-body').innerHTML = table_rows;
     },
-    error: function(data){
-            alert('errors');
+    error: function(error){
+            alert(error.responseText);
     }
     });
 }
 
 $(document).ready(function(){
+    $( function() {
+    $( "#datepicker" ).datepicker({
+        dateFormat: "yy-mm-dd"
+        }
+    );
+  } );
     load_accounts();
-    load_transactions();
     load_tags();
+    var current_date = new Date();
+    for_date = current_date.toISOString().split('T')[0];
+    document.getElementById('datepicker').value = for_date;
+    load_transactions(null,null,for_date);
 });
 
 function add_account_toggle(){
@@ -107,9 +153,14 @@ function create_account(){
             load_accounts();
         },
         error: function(error){
-            console.log(error);
+            alert(error.responseText);
         }
     });
+}
+
+function update_transactions_list(){
+    for_date = document.getElementById("datepicker").value;
+    load_transactions(null,null,for_date);
 }
 
 function create_tag(){
@@ -124,12 +175,53 @@ function create_tag(){
             load_tags();
         },
         error: function(error){
-            console.log(error);
+            alert(error.responseText);
         }
     });
 }
 
 function create_transaction(){
+    var select_element = document.getElementsByName('transaction_type')[0];
+    var transaction_type = select_element.selectedOptions[0].value;
+    var transaction_amount = document.getElementsByName('amount')[0].value;
+    var user_tag = document.getElementById('tags').value;
+    var primary_account = document.getElementById('header-form-primary-accounts').value;
+    var secondary_account = document.getElementById('header-form-secondary-accounts').value;
+    var transaction_date = document.getElementById('datepicker').value;
+    var postdata = {}
+    if (['BalanceReset', 'Expense', 'Income'].indexOf(transaction_type) > -1 ){
+        postdata = {
+            type: transaction_type,
+            amount: transaction_amount,
+            tag: user_tag,
+            primary_account: primary_account,
+            for_date: transaction_date
+        }
+    }
+    else if (transaction_type === 'Transfer'){
+        postdata = {
+            type: transaction_type,
+            amount: transaction_amount,
+            tag: user_tag,
+            primary_account: primary_account,
+            for_date: transaction_date,
+            secondary_account: secondary_account
+        }
+    }
+    console.log(postdata);
+    $.ajax({
+        url: "/transaction/1/",
+        type: "post",
+        data: postdata,
+        success: function(data){
+            load_accounts();
+            load_transactions(null, null, for_date);
+        },
+        error: function(error){
+            alert(error.responseText);
+        }
+    });
+
 }
 
 function delete_account(account_id){
@@ -140,7 +232,7 @@ function delete_account(account_id){
             load_accounts();
         },
         error: function(error){
-            console.log(error);
+            alert(error.responseText);
         }
     });
 }
@@ -150,10 +242,11 @@ function delete_transaction(transaction_id){
         url: "/transaction/"+transaction_id+"/",
         type: "delete",
         success: function(data){
-            load_transactions();
+            load_accounts();
+            update_transactions_list();
         },
         error: function(error){
-            console.log(error);
+            alert(error.responseText);
         }
     });
 }
@@ -166,7 +259,7 @@ function delete_tag(tag_id){
             load_tags();
         },
         error: function(error){
-            console.log(error);
+            alert(error.responseText);
         }
     });
 }
