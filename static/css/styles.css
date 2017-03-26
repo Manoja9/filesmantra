@@ -1,3 +1,22 @@
 .accounts-container{
     background-color: #EEEEEE;
 }
+.login-modal{
+    background-color: #EEEEEE;
+    padding: 1em;
+    margin-top: 3em;
+    border-radius: 1em;
+}
+
+.login-modal-text{
+    font-size: 1.5em;
+    margin-top: 1em;
+    color: #FFFFFF;
+}
+
+.login-modal-link{
+    background-color: #dd4b39;
+    border-radius: 2em;
+    max-width: 12em;
+    margin: 1em;
+}
