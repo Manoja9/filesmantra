@@ -4,17 +4,18 @@
       <a class="navbar-brand" href="#">FilesMantra</a>
     </div>
     <div class="navbar-form navbar-left">
-        <select name="transaction_type">
+        <select title="Transaction Type" name="transaction_type">
             <option value="Income">Income</option>
             <option value="Expense">Expense</option>
             <option value="BalanceReset">Balance Reset</option>
             <option value="Transfer">Transfer</option>
         </select>
-        <input type="number" name="amount" min="1" placeholder="Amount">
-        <select id="tags" placeholder="Tag"></select>
-        <select id="header-form-primary-accounts">
+        <input title="Amount" type="number" name="amount" min="1" placeholder="Amount">
+        <select title="User Tag let please don't select if you want it to be empty"id="tags" placeholder="Tag"></select>
+        <select title="Primary account in transaction" id="header-form-primary-accounts">
         </select>
-        <select id="header-form-secondary-accounts">
+        <select title="Secondary(or to account) account in transaction, mandatory incase of transfer"
+                id="header-form-secondary-accounts">
         </select>
         <input type="text" id="datepicker" placeholder="for_date" onchange="update_transactions_list()">
       <button onclick="create_transaction()" class="btn btn-default">
