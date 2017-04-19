@@ -9,7 +9,7 @@
   python manage.py migrate
   python manage.py runserver
  ```
- ### To run testcases
+ ### To run testcases for the APIs
  
  ```
   python manage.py test
